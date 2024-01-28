@@ -20,13 +20,36 @@
                 {
                     string line;
                     string[] words;
+                    string paragraph = string.Empty;
+                    bool startFlag = false;
+                    bool endFlag = false;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        var x = line.Select(x => x).Where(x => x.Equals(' ')).ToList();
-                        Console.WriteLine(line);
-                        words = line.Split(" ");
+                        if (endFlag) { 
+                            break; }
+                        if (line.Contains("*** END OF THE PROJECT")) 
+                        { 
+                            endFlag = true; }
+                        if (!startFlag)
+                        {
+                            if (line.Contains("*** START OF THE PROJECT")) { startFlag = true; }
+                            continue;
+                        }
+                        if (string.IsNullOrEmpty(line)) { continue; }
+                        paragraph = string.Concat(paragraph, string.Concat(line, "\n"));
+                        if (char.Equals(line.ElementAt(line.Length - 1), '.'))
+                        {
+                            //  Line ends with a dot indicating end of sentence/paragraph
+                            bookInfo.LoadParagraph(paragraph);
+                            paragraph = string.Empty;
+                        }
                     }
                 }
+                //
+                var longestSentences = bookInfo.LongestSentencesByChars(10).ToList();
+                var shortestSentences = bookInfo.ShortestSentencesByWords(10).ToList();
+                var longestWords = bookInfo.LongestWords(10);
+                var mostCommonLetters = bookInfo.MostCommonLetters(10);
             }
             catch (Exception e)
             {
