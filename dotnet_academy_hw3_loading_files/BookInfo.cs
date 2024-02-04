@@ -10,35 +10,16 @@ namespace dotnet_academy_hw3_loading_files
 {
     internal class BookInfo
     {
+        public string Title { get; set; }
         public List<string> Sentences { get; set; }
         public List<string> Words { get; set; }
         public Dictionary<char, uint> Punctuation { get; set; }
         public BookInfo() 
         {
+            Title = "Untitled";
             Sentences = new List<string>();
             Words = new List<string>();
             Punctuation = new Dictionary<char, uint>();
-        }
-
-        public string GetLongestSentenceByChars()
-        {
-            throw new NotImplementedException();
-        }
-        public string GetShortestSentenceByWords()
-        {
-            throw new NotImplementedException();
-        }
-        public string GetLongestWord()
-        {
-            throw new NotImplementedException();
-        }
-        public string GetMostCommonLetter()
-        {
-            throw new NotImplementedException();
-        }
-        public ICollection<string> GetWordsByUseDesc()
-        {
-            throw new NotImplementedException();
         }
         private void LoadWords(string text)
         {
@@ -119,6 +100,10 @@ namespace dotnet_academy_hw3_loading_files
                 }
             }
             return letterDict.OrderByDescending(x => x.Value).Take(count).ToDictionary();
+        }
+        public ICollection<string> WordsByUseDesc()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,60 +1,50 @@
-﻿namespace dotnet_academy_hw3_loading_files
+﻿
+
+using dotnet_academy_hw3_loading_files.input_data;
+
+namespace dotnet_academy_hw3_loading_files
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
-            var dir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent;
-            var path = String.Concat(dir.FullName, @"\input_data");
-            var bookInfo = new BookInfo();
+            Console.WriteLine("Volvo .Net Academy Homework #3: Loading Files Asynchronously");
+            //  TODO change code to use async programming
+            var projectDir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent;
+            var booksDir = String.Concat(projectDir.FullName, @"\input_data");
+            var outputDir = String.Concat(projectDir.FullName, @"\output_data");
+            var path = String.Concat(projectDir.FullName, @"\input_data\pg100.txt");
 
-            try
+            var bookLoader = new BookLoader();
+            var bookSaver = new BookFileSaver();
+            var books = new List<BookInfo>();
+
+            //  Get names of files in directory
+            var files = Directory.GetFiles(booksDir);
+            files = files.Where(f => f.EndsWith(".txt")).ToArray();
+            if (files.Length > 0) 
             {
-                if (!Directory.Exists(path)) 
+                foreach (var file in files)
                 {
-                    throw new DirectoryNotFoundException();
-                }
-                var fullPath = String.Concat(path, @"\", @"pg100.txt");
-                using (StreamReader sr = new StreamReader(fullPath))
-                {
-                    string line;
-                    string[] words;
-                    string paragraph = string.Empty;
-                    bool startFlag = false;
-                    bool endFlag = false;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        if (endFlag) { 
-                            break; }
-                        if (line.Contains("*** END OF THE PROJECT")) 
-                        { 
-                            endFlag = true; }
-                        if (!startFlag)
-                        {
-                            if (line.Contains("*** START OF THE PROJECT")) { startFlag = true; }
-                            continue;
-                        }
-                        if (string.IsNullOrEmpty(line)) { continue; }
-                        paragraph = string.Concat(paragraph, string.Concat(line, "\n"));
-                        if (char.Equals(line.ElementAt(line.Length - 1), '.'))
-                        {
-                            //  Line ends with a dot indicating end of sentence/paragraph
-                            bookInfo.LoadParagraph(paragraph);
-                            paragraph = string.Empty;
-                        }
+                    file.LastIndexOf(@"\");
+                    var fileName = file.Substring(file.LastIndexOf(@"\")+1);
+                    Console.WriteLine($"Working with file: {fileName}...");
+
+                    var book = bookLoader.LoadBook(file);
+                    
+                    if (book != null) 
+                    { 
+                        books.Add(book);
+                        Console.WriteLine($"Saving book: \"{book.Title}\" from file {fileName}...");
+                        bookSaver.SaveBook(book, outputDir);
+                        Console.WriteLine($"##### FILE {fileName} PROCESSED #####");
                     }
                 }
-                //
-                var longestSentences = bookInfo.LongestSentencesByChars(10).ToList();
-                var shortestSentences = bookInfo.ShortestSentencesByWords(10).ToList();
-                var longestWords = bookInfo.LongestWords(10);
-                var mostCommonLetters = bookInfo.MostCommonLetters(10);
+                Console.WriteLine($"All {books.Count} valid files processed");
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine("The file could not be read:");
-                Console.WriteLine(e.Message);
+                Console.WriteLine("Directory empty");
             }
         }
     }
