@@ -43,6 +43,7 @@ namespace dotnet_academy_hw3_loading_files
                     {
                         LoadFile(file, outputDir);
                     }
+                    watch.Stop();
                     Console.WriteLine($"All {files.Length} processed\nElapsed time(ms): {watch.ElapsedMilliseconds}");
                 }
             }
