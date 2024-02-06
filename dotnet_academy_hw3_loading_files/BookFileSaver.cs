@@ -10,12 +10,12 @@ namespace dotnet_academy_hw3_loading_files.input_data
     {
         public static void SaveBook(BookInfo book, string directory)
         {
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(directory,String.Concat(ToFileName(book.Title), "_", book.OriginalFileName, ".txt"))))
             {
-                if (!Directory.Exists(directory)) 
-                { 
-                    Directory.CreateDirectory(directory);
-                }
                 outputFile.WriteLine("Longest sentences by number of characters:");
                 var longestSentences = book.LongestSentencesByChars(10).ToList();
                 foreach (var sentence in longestSentences) 
@@ -59,12 +59,12 @@ namespace dotnet_academy_hw3_loading_files.input_data
         }
         public static async Task SaveBookAsync(BookInfo book, string directory)
         {
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(directory, String.Concat(ToFileName(book.Title), "_", book.OriginalFileName, ".txt"))))
             {
-                if (!Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
                 await outputFile.WriteLineAsync("Longest sentences by number of characters:");
                 var longestSentences = book.LongestSentencesByChars(10).ToList();
                 foreach (var sentence in longestSentences) 
