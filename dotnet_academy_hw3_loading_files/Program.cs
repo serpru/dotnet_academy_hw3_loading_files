@@ -10,7 +10,7 @@ namespace dotnet_academy_hw3_loading_files
         static async Task Main(string[] args)
         {
             //  Change this boolean to switch between using async or not
-            var runAsync = false;
+            var runAsync = true;
             Console.WriteLine("Volvo .Net Academy Homework #3: Loading Files Asynchronously");
             var projectDir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent;
             var booksDir = String.Concat(projectDir.FullName, @"\input_data");

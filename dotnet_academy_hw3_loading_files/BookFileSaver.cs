@@ -61,6 +61,10 @@ namespace dotnet_academy_hw3_loading_files.input_data
         {
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(directory, String.Concat(ToFileName(book.Title), "_", book.OriginalFileName, ".txt"))))
             {
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
                 await outputFile.WriteLineAsync("Longest sentences by number of characters:");
                 var longestSentences = book.LongestSentencesByChars(10).ToList();
                 foreach (var sentence in longestSentences) 
