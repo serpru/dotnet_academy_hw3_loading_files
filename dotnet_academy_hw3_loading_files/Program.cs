@@ -1,51 +1,86 @@
 ﻿
 
 using dotnet_academy_hw3_loading_files.input_data;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace dotnet_academy_hw3_loading_files
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
+            //  Change this boolean to switch between using async or not
+            var runAsync = false;
             Console.WriteLine("Volvo .Net Academy Homework #3: Loading Files Asynchronously");
-            //  TODO change code to use async programming
             var projectDir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent;
             var booksDir = String.Concat(projectDir.FullName, @"\input_data");
             var outputDir = String.Concat(projectDir.FullName, @"\output_data");
             var path = String.Concat(projectDir.FullName, @"\input_data\pg100.txt");
 
-            var bookLoader = new BookLoader();
-            var bookSaver = new BookFileSaver();
-            var books = new List<BookInfo>();
+            var bookLoadTasks = new List<Task>();
+
 
             //  Get names of files in directory
             var files = Directory.GetFiles(booksDir);
             files = files.Where(f => f.EndsWith(".txt")).ToArray();
             if (files.Length > 0) 
             {
-                foreach (var file in files)
+                if (runAsync)
                 {
-                    file.LastIndexOf(@"\");
-                    var fileName = file.Substring(file.LastIndexOf(@"\")+1);
-                    Console.WriteLine($"Working with file: {fileName}...");
-
-                    var book = bookLoader.LoadBook(file);
-                    
-                    if (book != null) 
-                    { 
-                        books.Add(book);
-                        Console.WriteLine($"Saving book: \"{book.Title}\" from file {fileName}...");
-                        bookSaver.SaveBook(book, outputDir);
-                        Console.WriteLine($"##### FILE {fileName} PROCESSED #####");
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
+                    foreach (var file in files)
+                    {
+                        bookLoadTasks.Add(LoadFileAsync(file, outputDir));
                     }
+                    await Task.WhenAll(bookLoadTasks);
+                    watch.Stop();
+                    Console.WriteLine($"All {files.Length} processed\nElapsed time(ms): {watch.ElapsedMilliseconds}");
                 }
-                Console.WriteLine($"All {books.Count} valid files processed");
+                else
+                {
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
+                    foreach (var file in files)
+                    {
+                        LoadFile(file, outputDir);
+                    }
+                    Console.WriteLine($"All {files.Length} processed\nElapsed time(ms): {watch.ElapsedMilliseconds}");
+                }
             }
             else
             {
                 Console.WriteLine("Directory empty");
             }
+        }
+        private static void LoadFile(string file, string outputDir)
+        {
+            var fileName = file.Substring(file.LastIndexOf(@"\") + 1);
+            Console.WriteLine($"Loading file: {fileName}...");
+
+            var book = BookLoader.LoadBook(file);
+
+            if (book != null)
+            {
+                Console.WriteLine($"Saving book: \"{book.Title}\" from file {fileName}...");
+                BookFileSaver.SaveBook(book, outputDir);
+                Console.WriteLine($"##### FILE {fileName} PROCESSED #####");
+            }
+        }
+        private static async Task<BookInfo?> LoadFileAsync(string file, string outputDir)
+        {
+            var fileName = file.Substring(file.LastIndexOf(@"\") + 1);
+            Console.WriteLine($"Loading file: {fileName}...");
+
+            var book = await BookLoader.LoadBookAsync(file);
+            Console.WriteLine($"File {fileName} loaded");
+
+
+            if (book != null)
+            {
+                Console.WriteLine($"Saving book: \"{book.Title}\" from file {fileName}...");
+                await BookFileSaver.SaveBookAsync(book, outputDir);
+                Console.WriteLine($"##### FILE {fileName} PROCESSED #####");
+            }
+            return await Task.FromResult(book);
         }
     }
 }
