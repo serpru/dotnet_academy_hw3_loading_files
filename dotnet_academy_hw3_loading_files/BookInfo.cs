@@ -14,6 +14,7 @@ namespace dotnet_academy_hw3_loading_files
         public List<string> Sentences { get; set; }
         public List<string> Words { get; set; }
         public Dictionary<char, uint> Punctuation { get; set; }
+        public string OriginalFileName { get; set; }
         public BookInfo() 
         {
             Title = "Untitled";
@@ -101,9 +102,17 @@ namespace dotnet_academy_hw3_loading_files
             }
             return letterDict.OrderByDescending(x => x.Value).Take(count).ToDictionary();
         }
-        public ICollection<string> WordsByUseDesc()
+        public IDictionary<string, uint> WordsByUseDesc(int count)
         {
-            throw new NotImplementedException();
+            Dictionary<string, uint> wordsDict = new Dictionary<string, uint>();
+            foreach (var word in Words)
+            {
+                if (!wordsDict.TryAdd(word, 1))
+                {
+                    wordsDict[word] += 1;
+                }
+            }
+            return wordsDict.OrderByDescending(w => w.Value).Take(count).ToDictionary();
         }
     }
 }
